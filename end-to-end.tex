@@ -1,0 +1,27 @@
+% !TEX root = ./abstract.tex
+\paragraph{Category Taxonomy}
+Multi-class classification with a targeted taxonomy structure among categories is often considered as hierarchical classification. In this case the targets are often understood as sets of categories with closely related categories grouped in the same set. A standard approach then is to decompose the problem into a sequence of multi-class classifications in a recursive top-down manner: 
+first discriminate the subsets of categories at the top level of the hierarchy before going down the next level to discern the categories (or sets of categories) in those subsets. This process is repeated until reaching the bottom level.  
+There are however two major shortcomings about the approach: 1. \emph{error propagation} where the mistakes made at the top-level will be carried over all the way to the leaf categories, and 2. \emph{data scarcity} where as the category become more specific the less training data there is for that category. 
+
+In this work we propose a more elegant and efficient approach with end-to-end learning from feature representation to multi-class classification. First of all, we simplify the problem by only considering the leaf categories in the taxonomy. In other words we flatten the hierarchy so that the problem becomes classic multi-classification. 
+The trade-off is that while in the top-down approach the problem is decomposed into smaller subproblems each with only a few categories, now we consider 1000+ leaf categories all at once. We will see that this enables us to achieve a globally optimal solution in a sense that given an item a personalized total ranking can be learned among all leaf categories. This also present challenges to the problem due to the large scale output space. 
+
+Knowledge sharing (cite) has been shown to be important in multi-task learning scenarios like this where tasks are closely related and knowledge gained from one task can be used to facilitate the training of another one. 
+We will also see that knowledge sharing is now possible by solving a unified single problem whereas before each subproblem is trained independently. 
+
+
+\paragraph{Negative Sampling With Log Loss}
+A standard approach in multi-class classification is to maximize the log probability estimated using softmax. This can become computationally expensive when the output space is large due to the need to compute the normalization factor. A more efficient alternative is to make use of negative sampling (cite),
+\begin{align}
+\label{equ:obj}
+    - \log \sigma(f_{x, c_x}(\omega)) 
+    - \sum_{i=1}^k E_{c_i \sim p_n(c)} \log \sigma(-f_{x, c_i}(\omega))
+\end{align}
+Here, the logit function $f_{x, c}(\omega)$ is parameterized by $\omega$ and $\sigma(f_{x, c}(\omega))$ approximates the probability of the item $x \in \XCal$ being in the category $c \in \CCal$. By minimizing \eqref{equ:obj} we increase the probability of $x$ being in the ground truth category $c_x$ while decreasing the probability of $x$ in the wrong category sampled from the noise distribution $p_n(c)$ approximated using $n_c / n$ which is the number of category $c$ in the training set divided by the total size of the training set. Now note that \eqref{equ:obj} unlike Noise Contractive Estimation (cite) does not constitute an approximation to log probability of the full softmax. But it serves the purpose of classification where only the top scores matter.
+
+\paragraph{Joint Training of Word Embedding and Linear Classifier}
+\paragraph{Asynchronous SGD with Momentum}
+
+
+
