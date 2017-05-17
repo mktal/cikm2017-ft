@@ -1,6 +1,62 @@
 % @Author: Xiaocheng Tang
 % @Date:   2017-05-11 22:04:57
 % @Last Modified by:   Xiaocheng Tang
-% @Last Modified time: 2017-05-11 22:05:02
+% @Last Modified time: 2017-05-16 17:07:29
 % !TEX root = ./abstract.tex
+
+\begin{figure*}
+% \centering
+\begin{subfigure}{0.4\textwidth}
+   \includegraphics[width=\columnwidth]{resources/noise-detect}
+   \caption{}
+   \label{fig:Accuracy-Per-Sample}
+\end{subfigure}
+\begin{subfigure}{0.2\textwidth}
+   \includegraphics[width=\textwidth]{resources/cluster}
+   \caption{cluster}
+   \label{fig:Accuracy-Per-Sample}
+\end{subfigure}
+\begin{subfigure}{0.2\textwidth}
+   \includegraphics[width=\textwidth]{resources/wc}
+   \caption{wc}
+   \label{fig:Accuracy-Per-Sample}
+\end{subfigure}
+% \subfigure[cluster]
+% {
+%    \includegraphics[width=0.35\columnwidth]{resources/cluster}
+%    \label{fig:Accuracy-Per-Sample}
+% }~
+% \subfigure[noise detect]
+% {
+%    \includegraphics[width=0.47\columnwidth]{resources/noise-detect.pdf}
+%    \label{fig:circular_tree_hml}
+% }	
+\end{figure*}
+
+\begin{table*}
+  \caption{Strongest Unigram Features for Category Prediction}
+  \label{tab:features}
+  \begin{tabular}{cccccccl}
+    \toprule
+    JEANS > MEN	&	JEANS > WOMEN	&	WEARABLE DEVICES	&	 BEER	&	 WINE	&	CHOCOLATES	&	 GOLF BALLS	 & MOBILE PHONES \\
+    \midrule
+    brixton	&	jeans-	&	smartwatch	&	ipa	&	chardonnay	&	ferrero	&	titleist	&	zte	\\
+    graduate	&	suki	&	misfit	&	ale	&	brut	&	m\&m	&	srixon	&	huawei	\\
+    normandie	&	super-skinny	&	fitbit	&	beer	&	prosecco	&	lindt	&	callaway	&	kyocera	\\
+    fit-	&	rips	&	jawbone	&	budweiser	&	riesling	&	hersheys	&	maxfli	&	unlocked	\\
+    rude	&	wedgie	&	forerunner	&	lagunitas	&	pinot	&	m\&ms	&	volvik	&	sam	\\
+    skinny-fit	&	straight-leg &	vivofit	&	heineken	&	malbec	&	milka	&	taylormade	&	lg	\\
+    levi's\textregistered	&	pajamajeans	&	tracker	&	coors	&	cellars	&	snickers	&	pinnacle	&	xperia	\\
+    501	&	stevie	&	fitness	&	lager	&	wine	&	kisses	&	bridgestone	&	iphone	\\
+    a\&f	&	524\texttrademark	&	nike+	&	modelo	&	vermouth	&	kinder	&	balls	&	motoroladroid	\\
+    527	&	524	&	pebble	&	shiner	&	moscato	&	cadbury	&	dozen	&	smartphone	\\
+    sartor	&	5pkt	&	garmin	&	peroni	&	blanc	&	ghirardelli	&	distance	&	 iphone\textregistered	\\
+    selvedge	&	jegg	&	withings	&	bottles	&	cabernet	&	brookside	&	wilson	&	galaxy	\\
+    carpenter	&	rockstar	&	vivosmart	&	guinness	&	zinfandel	&	twix	&	golf	&	htc	\\
+    stonewash	&	nouveau	&	activity	&	corona	&	sauvignon	&	butterfinger	&	cornmeal	&	prepaid	\\
+    matchbox	&	seabreeze	&	smartband	&	sixpoint	&	750ml	&	godiva	&	flite	&	tracfone \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
 
