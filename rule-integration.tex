@@ -4,9 +4,18 @@
 % @Last Modified time: 2017-05-11 22:02:26
 % !TEX root = ./abstract.tex
 
-In this work we utilize generative models to create new training labels and de-noise the data (\cite{genmodels}). The model applies generative processes to labeling functions and learns their structural correlations and conflicts. We incorporate numerous labeling functions as a supply of domain knowledge for weak supervision. Table (\ref{tab:numrules}) lists some of the categories and the number of rules associated with them. Labeling functions assign 1 if the product belongs to the category, -1 if it does not and 0 if it is uncertain\cite{genmodels}.
+In this work we utilize generative models to create new training labels and de-noise the data (\cite{genmodels}).
+The model applies generative processes to labeling functions and learns their structural correlations and conflicts.
+We incorporate numerous labeling functions as a supply of domain knowledge for weak supervision. Table (\ref{tab:numrules})
+lists some of the categories and the number of rules associated with them. Labeling functions assign 1 if the product belongs
+to the category, -1 if it does not and 0 if it is uncertain\cite{genmodels}.
 
-The generative model optimizes noise aware loss function and estimates probabilities $p(Label, \lambda)$, where $Label$ is the category we want to predict, $\lambda = f(x)$ is a list of values assigned by labeling function $f$ to product $x$.  Since current implementation of generative model is binary we apply it for each category separately and combine resulted labeled data in a final output. Picture (\ref{fig:genmodel_pred_probs}) shows the distribution of marginal probabilities for several classes. We assume that the product belongs to certain category if prediction probability is greater or equal to 0.5.
+The generative model optimizes noise aware loss function and estimates probabilities $p(Label, \lambda)$,
+where $Label$ is the category we want to predict, $\lambda = f(x)$ is a list of values assigned by labeling
+function $f$ to product $x$.  Since current implementation of generative model is binary we apply it for each
+category separately and combine resulted labeled data in a final output. Picture (\ref{fig:genmodel_pred_probs}) shows
+the distribution of marginal probabilities for several classes. We assume that the product belongs to certain category if
+prediction probability is greater or equal to 0.5.
 
 Ultimately, we combine generated and manually labeled training sets to train a discriminative model to predict accurate product categories.
 
