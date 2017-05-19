@@ -17,6 +17,12 @@ category separately and combine resulted labeled data in a final output. Picture
 the distribution of marginal probabilities for several classes. We assume that the product belongs to certain category if
 prediction probability is greater or equal to 0.5.
 
+We use unlabeled product items to train generative model and apply learned model to manually labeled test data and measure
+prediction accuracy (\ref{tab:evaluation}).
+The train and test sets contains respectively approx. 100k and 20k product items.
+
+@TODO create rule overlap chart
+
 Ultimately, we combine generated and manually labeled training sets to train a discriminative model to predict accurate product categories.
 
 \begin{table*}
