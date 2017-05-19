@@ -17,7 +17,7 @@ We will also see that knowledge sharing is now possible by solving a unified sin
 \end{figure}
 
 \paragraph{Negative Sampling With Log Loss}
-A standard approach in multi-class classification is to maximize the log probability estimated using softmax. This can become computationally expensive when the output space is large due to the need to compute the normalization factor. In this work we make use of a more efficient alternative based on negative sampling (cite),
+A standard approach in multi-class classification is to maximize the log probability estimated using softmax. This can become computationally expensive when the output space is large due to the need to compute the normalization factor. In this work we make use of a more efficient alternative based on negative sampling \cite{mikolov2013distributed},
 \begin{align}
 \label{equ:obj}
     \JCal(\omega) = 
@@ -35,7 +35,7 @@ Here we discuss the specific structure we use for the logit function $f_{x, c}(\
 \end{align*}
 Note that if letting $W = UV^T$ the above equation becomes $x^TW$ which is a standard form of multi-class classifier. By splitting $W$ into two matrices $U$ and $V$ we are essentially imposing a low-rank structure onto the classifier. This greatly reduces the number of learning parameters and has been widely used in recommendation system, multi-task learning, etc, to improve generalization.
 
-In feature extraction we include both unigram and n-gram. We use all unigram and apply hashing tricks (cite) to n-gram, e.g., hashing each n-gram to a preset number of buckets. This has been shown to avoid overfitting and to improve system efficiency. In other words, if there are 1000 unique tokens and the bucket size is set to 500, then the dimension of $x$ will be 1000 + 500 = 1500 where each entry is 0 or 1 denoting whether the corresponding token or n-gram is present in the item description or not. In practice the size of the vector $x$ will be millions but very sparse. For efficient implementation we only store the indices of the non-zeros entries in $x$ and the matrix-vector multiplication between $x$ and $U$ takes only a loop through the non-zeros entries which are only the number of tokens in the item description. 
+In feature extraction we include both unigram and n-gram. We use all unigram and apply hashing tricks \cite{weinberger2009feature} to n-gram, e.g., hashing each n-gram to a preset number of buckets. This has been shown to avoid overfitting and to improve system efficiency. In other words, if there are 1000 unique tokens and the bucket size is set to 500, then the dimension of $x$ will be 1000 + 500 = 1500 where each entry is 0 or 1 denoting whether the corresponding token or n-gram is present in the item description or not. In practice the size of the vector $x$ will be millions but very sparse. For efficient implementation we only store the indices of the non-zeros entries in $x$ and the matrix-vector multiplication between $x$ and $U$ takes only a loop through the non-zeros entries which are only the number of tokens in the item description. 
 
 Now let us look at how we enable knowledge sharing in this context. Specifically, each task, or category in this case, corresponds to one row of the category matrix $V$, which captures the uniqueness of the task. The common knowledge shared by all task is reflected in the item matrix $U$. During training $U$ will be updated by examples regardless of which categories they belong to, while the rows in $V$ are only updated with the examples in the corresponding categories. In this way $U$ can help improve the accuracy of the category even though there are only a few training data in that category. This addresses the aforementioned \emph{data scarcity and imbalance} issues in the top-down approach.
 
@@ -44,34 +44,33 @@ The embedding matrices $U, V$ are trained using stochastic gradient descent with
 The major procedures are presented in Algorithm \ref{alg:asgd}. 
 The main update rules are described in Line \ref{stp:asgd-update-begin}-\ref{stp:asgd-update-end}. 
 Here $v_{c_x}$ denotes the vector representation of category $c_x$ and $u_i, i \in nnz(x)$ denotes the feature vector corresponding to the $i$th non-zero entry of $x$.
-We will see that when the training dataset is highly sparse Algorithm \ref{alg:asgd} can be converted to a single-threaded implementation of block coordinate descent. In fact, consider two training examples $(x_1, c_1)$ and $(x_2, c_2)$ such that $nnz(x_1) \cap nnz(x_2) = \emptyset$ and that $c_1 \neq c_2$. According to Algorithm \ref{alg:asgd} $(x_1, c_1)$ and $(x_2, c_2)$ will result in update on $\omega_1 = (v_1, U_{nnz(x_1)})$ and $\omega_2 = (v_2, U_{nnz(x_2)})$, respectively. Note that $\omega_1$ and $\omega_2$ does not overlap because the categories and the non-zeros entries of training examples do not overlap. The computations of their partial derivatives are also independent of each other. 
-Hence the update procedures in Line \ref{stp:asgd-update-begin}-\ref{stp:asgd-update-end} can happen simultaneously without the need for a lock.
-
-Finally we make use of momentum in the update (Line \ref{stp:asgd-v-momentum} and \ref{stp:asgd-u-momentum}).
+We will see that when the training dataset is highly sparse Algorithm \ref{alg:asgd} is the same as if the operations were executed in some sequential order of block coordinate descent. In fact, consider two training examples $(x_1, c_1)$ and $(x_2, c_2)$ such that $nnz(x_1) \cap nnz(x_2) = \emptyset$ and that $c_1 \neq c_2$. According to Algorithm \ref{alg:asgd} $(x_1, c_1)$ and $(x_2, c_2)$ will result in update on $\omega_1 = (v_1, U_{nnz(x_1)})$ and $\omega_2 = (v_2, U_{nnz(x_2)})$, respectively. Note that $\omega_1$ and $\omega_2$ does not overlap because the categories and the non-zeros entries of training examples do not overlap. The computations of their partial derivatives are also independent of each other. 
+Hence the update procedures in Line \ref{stp:asgd-update-begin}-\ref{stp:asgd-update-end} can happen simultaneously without the need for a lock. 
+Finally we make use of momentum in the update (Line \ref{stp:asgd-v-momentum} and \ref{stp:asgd-u-momentum}). The descent direction is obtained by a linear combination of current gradient and a running average of previous gradients. This has been shown to accelerate SGD in the relevant direction and dampen oscillations especially during navigating ravines \cite{rumelhart1988learning}.
 
 \begin{algorithm2e}[htb]
 \caption{Asynchronous SGD With Momentum.}
 \label{alg:asgd}
-  Input: $\gamma \in (0, 1), \eta > 0, T > 0$, 
+  \textbf{Input}: $\gamma \in (0, 1), \eta > 0, T > 0$, 
   the training set $\DCal \subset \XCal \times \CCal$ \\
-  Initialize randomly the trainable parameters $U, V$ \\
-  Initialize to zero the momentum parameters $\bar U, \bar V$ \\
-  \For{each thread} {
+  initialize randomly the trainable parameters $U, V$ \\
+  initialize to zero the momentum parameters $\bar U, \bar V$ \\
+  \For(\tcp*[h]{asynchronously}) {each thread} {
     \For(\tcp*[h]{main iteration}) {$t=1,2,...,T$} {
 	    sample $(x, c_x) \in \DCal$ \\
-	    $\bar v_{c_x} \gets \gamma \bar v_{c_x} + \eta \nabla_{v_{c_x}} \JCal(U, V)$ \\
+	    $\bar v_{c_x} \gets \gamma \bar v_{c_x} + \nabla_{v_{c_x}} \JCal(U, V)$ \\
 	    \label{stp:asgd-update-begin}
 	    \label{stp:asgd-v-momentum}
-	    $v_{c_x} \gets v_{c_x} - \bar v_{c_x}$ \\
+	    $v_{c_x} \gets v_{c_x} - \eta \bar v_{c_x}$ \\
 	    \For{each $i \in nnz(x)$} {
-	    	$\bar u_i \gets \gamma \bar u_i + \eta \nabla_{u_i} \JCal(U, V)$ \\
+	    	$\bar u_i \gets \gamma \bar u_i + \nabla_{u_i} \JCal(U, V)$ \\
 		    \label{stp:asgd-u-momentum}
-	    	$u_i \gets u_i - \bar u_i$
+	    	$u_i \gets u_i - \eta \bar u_i$
 	    }
 	    \label{stp:asgd-update-end}
     }
   }
-  Output: model parameters $U, V$
+  \textbf{Output}: model parameters $U, V$
 \end{algorithm2e}
 
 

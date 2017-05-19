@@ -2,9 +2,9 @@
 % @Author: Xiaocheng Tang
 % @Date:   2017-05-11 22:04:57
 % @Last Modified by:   Xiaocheng Tang
-% @Last Modified time: 2017-05-16 23:13:24
+% @Last Modified time: 2017-05-17 23:23:01
 
-\begin{figure*}
+\begin{figure*}[th]
 \centering
 \begin{subfigure}[b]{0.35\textwidth}
    \includegraphics[width=\textwidth]{resources/noise-detect}
@@ -21,19 +21,51 @@
    \caption{Top feature clouds.}
    \label{fig:wc}
 \end{subfigure}
-\caption{In (\ref{fig:noise-detect}) it shows eight categories and their training sample `confidence' scores distribution. Outliers are denoted by black dots. (\ref{fig:cluster}) visualizes the dense 50-dimensional item vectors that are projected onto the 2-dimensional space using t-SNE with 50 perplexity and PCA initialization. (\ref{fig:wc}) is generated from top key words in categories \emph{wine} (bottom) and \emph{mobile phones} (above).}
+\caption{In (\ref{fig:noise-detect}) it shows eight categories and their training sample `confidence' scores distribution. Outliers are denoted by black dots. (\ref{fig:cluster}) visualizes the dense 50-dimensional item vectors that are projected onto the 2-dimensional space using t-SNE with 50 perplexity and PCA initialization. (\ref{fig:wc}) is generated from top key words in categories \emph{wine} (bottom) and \emph{mobile phones} (above). Words with bigger sizes indicate stronger predicators for the category.}
 \end{figure*}
 
-\subsection{De-noising Training Sample} % (fold)
+\subsection{De-noising Training Set} % (fold)
 \label{sub:de_noising_training_sample}
 
-Items that are labeled incorrectly will affect the qualities of the categorization system if a lot of them are present in the dataset used for training. Noises get introduced into the training set either due to conflict or noisy business rules or because of the labeling process which is often labor-intensive and thus error-prone. Here we discuss an effective de-noising approach based on active learning \cite{culotta2005reducing}, which alternatively update the least `confident' items given the classifier or the classifier given the training data.
+Items with incorrect labels will affect the qualities of the categorization system if many are present in the dataset used for training. Those noisy items get introduced into the training set either due to conflict in the business rules or because of the labeling process which is often labor-intensive and error-prone. Here we use a de-noising approach based on active learning \cite{culotta2005reducing}, by alternatingly updating the least `confident' items given the classifier and the classifier given the training data. We observe that de-noising helps improve the accuracy of the system.
+The main procedures are described in Algorithm \ref{alg:denoising}. 
+An illustration of the intermediate results from one iteration of Algorithm \ref{alg:denoising} is shown in Figure~\ref{fig:noise-detect}. The training data confidence scores for nine categories are presented. 
+Outliers are shown as black dots, for example, the obvious one at the left bottom corner of Figure~\ref{fig:noise-detect}. The central rectangle contains the scores between the first and the third quantile. A thin rectangle with high median score indicates a goodness of fit.
+In the experiments we find that the outliers are either labeled incorrectly or the classifier failing to learn the item sufficiently. For the former we either relabel or remove them from the training set. and for the latter we duplicate and add them back to the training set to increase their exposures to the training algorithm so the system learn them better. 
+
+
+\begin{algorithm2e}[htb]
+\caption{Training Set De-noising Procedures.}
+\label{alg:denoising}
+  \textbf{Input}: $\XCal_o = \emptyset, \DCal = \XCal \times \CCal, U, V, \eta > 0$ \\ 
+  \Repeat{$\XCal_o \neq \emptyset$}{
+    retrain $U, V$ from $\DCal$ \\
+    compute the logit matrix $L = XUV^T, L \in \Rmbb^{N \times |\CCal|}$ \\
+    normalize $L$ such that all entries are between $(0, 1)$ \\
+    create the vector $l \in \Rmbb^N$ where $l_i = L_{ic_i}$  \\
+    set $\XCal_o$ to be empty \\
+    \For{each $c \in \CCal$} {
+        rank $l_c \in \Rmbb^{N_c}$ in descending order \\
+        compute the range of variation ($IQR$) from $l_c$ \\
+        collect points that are $\eta \times IQR$ below the first quantile \\
+        add those points to $\XCal_o$
+    }
+    update $\DCal$ by either removing or relabeling $x \in \XCal_o$
+  }
+  \textbf{Output}: $U, V, \DCal$
+\end{algorithm2e}
+
+\subsection{Feature Representation And Selection} % (fold)
+\label{sub:catefeature_selection}
+We demonstrate that our end-to-end system does not require feature engineering or preprocessing in the sense that it automatically extracts and selects important features from raw item descriptions. Furthermore, it does not require the removal of stop words or punctuations. On the contrary, it is observed that using raw text without preprocessing improves the performance. Table~\ref{tab:features} shows the different features selected by different categories for prediction. The features are ranked by their relative importance to the given category vector. The importance scores are obtained by taking the inverse of the cosine distance between the category and the feature in the vector space. Notice that many world-famous brands are selected as important features, such as levi's for \emph{jeans}, fitbit, jawbone for \emph{wearable devices}, and ferrero, hersheys for \emph{chocolates}, etc. This makes sense since those brand words might very well be the most frequent words in that category. However, notice also that no stop words make it to the list although they are quite frequent as well. Moreover, note that each category automatically selects its own set of features for prediction, although features are shared among all categories. For example, it is interesting to see that the system figures out on its own that, for jeans, 501 is more popular with men while women like 524. Finally Figure~\ref{fig:cluster} demonstrates the discriminative property of the item vectors. In this experiment, we take a subset of items from eight categories and project them onto the 2-dimensional space. It can be seen from the figure that eight clusters are easily identified and well separated. It is interesting to notice that categories with similar meaning are close to each other, e.g., electronic devices (wearable and phones) on the top and apparel (men and women jeans) on the right side.  
+% subsection catefeature_selection (end)
+
 
 
 % subsection de_noising_training_sample (end)
 
 \begin{table*}
-  \caption{Strongest Unigram Features for Category Prediction}
+  \caption{Strongest Unigram Signals / Keywords for Category Prediction}
   \label{tab:features}
   \begin{tabular}{cccccccl}
     \toprule
