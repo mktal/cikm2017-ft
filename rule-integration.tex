@@ -12,16 +12,21 @@ to the category, -1 if it does not and 0 if it is uncertain\cite{genmodels}.
 
 The generative model optimizes noise aware loss function and estimates probabilities $p(Label, \lambda)$,
 where $Label$ is the category we want to predict, $\lambda = f(x)$ is a list of values assigned by labeling
-function $f$ to product $x$.  Since current implementation of generative model is binary we apply it for each
-category separately and combine resulted labeled data in a final output. Picture (\ref{fig:genmodel_pred_probs}) shows
+functions $f$ to product $x$.
+
+Since current implementation of generative model is binary, we apply it to each
+category separately and combine the results in a final output. Picture (\ref{fig:genmodel_pred_probs}) shows
 the distribution of marginal probabilities for several classes. We assume that the product belongs to certain category if
 prediction probability is greater or equal to 0.5.
 
 We use unlabeled product items to train generative model and apply learned model to manually labeled test data and measure
 prediction accuracy (\ref{tab:evaluation}).
-The train and test sets contains respectively approx. 100k and 20k product items.
+The train and test sets contain respectively 100k and 20k product items.
+'Boots \textgreater Women' category contains 88 rules with very small overlap, whereas 'Boots \textgreater Men' category
+has less rules but more overlaps and conflicts. Despite of the noise and rule conflicts the model is able to learn from rules with high accuracy (\ref{tab:evaluation}).
 
-@TODO create rule overlap chart
+In addition, we demonstrate the fraction of coverage, overlaps and conflicts in table (\ref{tab:overlapconflict}). The results show that despite
+of the small rules coverage in the presence of conflicts and overlaps the system is able to generalise and de-noise the data.
 
 Ultimately, we combine generated and manually labeled training sets to train a discriminative model to predict accurate product categories.
 
@@ -49,11 +54,30 @@ Ultimately, we combine generated and manually labeled training sets to train a d
     \toprule
     Category & Presicion & Recall & F1 & Accuraccy & Neg Class Accuracy & Pos Class Accuracy\\
     \midrule 
-    Boots \textgreater Women	& 98\% & 100\% & 99\% & 98\% & 100\% & 98\% \\
-    Boots \textgreater Men &	95\%	& 100\% & 97\% & 98\% & 100\% & 95\% \\
+    Boots \textgreater Women	& 93\% & 96\% & 94\% & 99\% & 96\% & 93\% \\
+    Boots \textgreater Men &	60\%	& 75\% & 66\% & 99\% & 75\% & 60\% \\
     \bottomrule
   \end{tabular}
 \end{table*}
+
+\begin{table*}
+  \caption{The coverage, overlaps and conflicts for a fraction of rules from 'Boots \textgreater Men' category}
+  \label{tab:overlapconflict}
+  \begin{tabular}{llll}
+    \toprule
+    Rule Label & Coverage & Overlaps & Conflicts \\
+    \midrule
+    Regexp_1	& 0.003050 & 0.003025 & 0.000025 \\
+    Regexp_2	& 0.148550 & 0.007500 & 0.000125 \\
+    Regexp_3	& 0.067900 & 0.002650 & 0.000100 \\
+    Regexp_4	& 0.783975 & 0.007050 & 0.000100 \\
+    ... \\
+    Regexp_{35}	& 0.008150 & 0.002400 & 0.000100 \\
+    Regexp_{36}	& 0.020120 & 0.016793 & 0.000000 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
 \begin{figure}[th]
    \includegraphics[width=0.5\textwidth]{resources/genmodel_pred_probs}
    \caption{The distribution of marginal probabilities}
