@@ -1,6 +1,37 @@
 % @Author: Xiaocheng Tang
 % @Date:   2017-05-11 22:03:41
 % @Last Modified by:   Xiaocheng Tang
-% @Last Modified time: 2017-05-11 22:03:48
+% @Last Modified time: 2017-05-21 00:20:35
 % !TEX root = ./abstract.tex
+
+Associating an item with a taxonomy is often the first step of organizing the online products. 
+Almost every e-commerce website, such as Amazon and eBay, all have taxonomies to help online shoppers to navigate and find products.
+To classify an item into a taxonomy, most minimum viable products often start with a rule-based system. 
+Domain experts are hired to write rules to classify popular items. 
+
+Naturally,  taxonomy classification tasks can be viewed as supervised learning problem, 
+but in practice, the cost of acquiring training data, say through crowd-sourcing, could be high. 
+Not to mention that having a non-trained person classifies an item could end up with training 
+data with high noise level.
+Those carefully, hand-crafted rules are often abandoned.
+and in this work, we proposed an end-to-end solution to convert rules into weak training data.
+
+A rule can often be considered as a classifier with output 1 (matched), -1 (not-matched) or 0 (unknown) for a given category. The issue with using rules to obtain extra training data, however, is that it can introduce unwanted noises into the training process since there often conflicts and false generalization when combining multiple rules together. One way to resolve conflicts is to use a voting scheme, taking the majority of the votes as the final output. This, of course, is not ideal because it assumes same accuracy across all rules. Following the approach described in \cite{Ratner2016}, we instead model the rule accuracy explicitly, as a generative model, and use that to obtain weight for each rule, reflecting our belief on how accurate each rule is. We show that this in turn can be used to obtain the conditional probability $p(category | rules)$.
+
+Another important component of the item categorization system is to deal with the category taxonomy. 
+A standard approach is to decompose the problem into a sequence of multi-class classifications in a recursive top-down manner\cite{authur2010,cai2004hierarchical}: 
+first discriminate the subsets of categories at the top level of the hierarchy before going down the next level to discern the categories (or sets of categories) in those subsets. This process is repeated until reaching the bottom level.  
+There are however two major shortcomings about the approach: 1. \emph{error propagation} where the mistakes made at the top-level will be carried over all the way to the leaf categories; 2. \emph{data scarcity and imbalance} where as the category become more specific the less training data there is for that category; and 3. \emph{large dimension with no knowledge sharing} where each category has its own sets of parameters trained independently of the other categories.
+
+In our item categorization system we design the main component to directly address the above issues. At the core of our solution is a \emph{two-layers neural network}, with the first layer corresponding to the feature parameters and the second layer targeting the \emph{leaf category} parameters. 
+While the reduction on the dimensionality is significant, from before O(|feature| x |all categories|), to now O(|feature| + |leaf categories|), we will also see that it enables knowledge sharing across categories such that unique features for a particular category get promoted and those features common to all categories get downvoted. 
+Feature selection, for example, happens automatically for each category, and feature engineering like removing stop words, punctuations, or computing tf-idf, is no longer needed since common words will automatically get canceled out during the training process. 
+
+
+
+
+
+
+
+
 
