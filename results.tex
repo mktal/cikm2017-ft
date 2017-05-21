@@ -90,4 +90,68 @@ We demonstrate that our end-to-end system does not require feature engineering o
   \end{tabular}
 \end{table*}
 
+\subsection{Rule Integration} % (fold)
+\label{sub:rule-integration}
 
+We conducted the experiments for six categories listed in Table (\ref{tab:numrules}). Since current implementation
+of generative model is binary(\cite(link to snorkel)), we applied it to each category separately and combined the results in a final output.
+
+The generative model outputs marginal probabilites for each product item. Figure (\ref{fig:genmodel_pred_probs}) demonstrates
+the distribution of those probabilities for some categories.
+We assume that the product belongs to certain category if prediction probability is greater or equal to 0.5.
+
+In addition, we demonstrate the fraction of coverage, overlaps and conflicts in Figure (\ref{fig:covconflict}). The diagram shows
+ small rule coverage and the presence of conflicts and overlaps in 'Boots \textgreater Men' category. The overlaps and conflicts
+are computed for each labeling function with respect to other functions.
+
+We used unlabeled product items to train generative model and applied learned model to manually label test data and measure
+prediction accuracy. The train and test sets contain respectively 100k and 20k product items. According to
+our experimental results shown in table (\ref{tab:evaluation}), 'Boots \textgreater Women' category has high precision/recall and accuracy due to
+precise and less conflictous rules, whereas 'Boots \textgreater Men' category has less rules but more overlaps and conflicts.
+High accuracy score in 'Men \greater Boots' category is associated with the large number of true negatives which overly exceeds
+true/false positives and false negatives in that category.
+
+Ultimately, we combine generated and manually labeled training sets to train a discriminative model to predict accurate product categories.
+
+\begin{table}
+  \caption{Examples of the category labels and the total numbers of rules in each category}
+  \label{tab:numrules}
+  \begin{tabular}{ll}
+    \toprule
+    Category & \#Rules\\
+    \midrule
+    Boots \textgreater Women &  88  \\
+    Boots \textgreater Men  & 36 \\
+    Travel \textgreater Hotel & 30 \\
+    Home \textgreater LampShades & 19 \\
+    Home \textgreater Other & 11 \\
+    Grocery \textgreater Nutrition Drinks & 11 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}
+  \caption{Evaluation results for several categories on sub-sampled data}
+  \label{tab:evaluation}
+  \begin{tabular}{lllllll}
+    \toprule
+    Category & Presicion & Recall & F1 & Accuraccy & Neg Class Accuracy & Pos Class Accuracy\\
+    \midrule
+    Boots \textgreater Women  & 93\% & 96\% & 94\% & 99\% & 96\% & 93\% \\
+    Boots \textgreater Men &  60\%  & 75\% & 66\% & 99\% & 75\% & 60\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[th]
+   \includegraphics[width=0.5\textwidth]{resources/covconflict}
+   \caption{The fraction of coverage, overlaps and conflicts for the rules from 'Boots \textgreater Men' category}
+   \label{fig:covconflict}
+   \centering
+\end{figure}
+\begin{figure}[th]
+   \includegraphics[width=0.5\textwidth]{resources/genmodel_pred_probs}
+   \caption{The distribution of marginal probabilities}
+   \label{fig:genmodel_pred_probs}
+   \centering
+\end{figure}
