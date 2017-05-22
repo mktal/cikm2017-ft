@@ -2,7 +2,7 @@
 % @Author: Xiaocheng Tang
 % @Date:   2017-05-11 22:04:57
 % @Last Modified by:   Xiaocheng Tang
-% @Last Modified time: 2017-05-17 23:23:01
+% @Last Modified time: 2017-05-22 01:01:56
 
 \begin{figure*}[th]
 \centering
@@ -37,7 +37,7 @@ In the experiments we find that the outliers are either labeled incorrectly or t
 \begin{algorithm2e}[htb]
 \caption{Training Set De-noising Procedures.}
 \label{alg:denoising}
-  \textbf{Input}: $\XCal_o = \emptyset, \DCal = \XCal \times \CCal, U, V, \eta > 0$ \\ 
+  \textbf{Input}: $\XCal_o = \emptyset, \DCal \subset \XCal \times \CCal, U, V, \eta > 0$ \\ 
   \Repeat{$\XCal_o \neq \emptyset$}{
     retrain $U, V$ from $\DCal$ \\
     compute the logit matrix $L = XUV^T, L \in \Rmbb^{N \times |\CCal|}$ \\
@@ -80,12 +80,12 @@ We demonstrate that our end-to-end system does not require feature engineering o
     levi's\textregistered	&	pajamajeans	&	tracker	&	coors	&	cellars	&	snickers	&	pinnacle	&	xperia	\\
     501	&	stevie	&	fitness	&	lager	&	wine	&	kisses	&	bridgestone	&	iphone	\\
     a\&f	&	524\texttrademark	&	nike+	&	modelo	&	vermouth	&	kinder	&	balls	&	motoroladroid	\\
-    527	&	524	&	pebble	&	shiner	&	moscato	&	cadbury	&	dozen	&	smartphone	\\
-    sartor	&	5pkt	&	garmin	&	peroni	&	blanc	&	ghirardelli	&	distance	&	 iphone\textregistered	\\
-    selvedge	&	jegg	&	withings	&	bottles	&	cabernet	&	brookside	&	wilson	&	galaxy	\\
-    carpenter	&	rockstar	&	vivosmart	&	guinness	&	zinfandel	&	twix	&	golf	&	htc	\\
-    stonewash	&	nouveau	&	activity	&	corona	&	sauvignon	&	butterfinger	&	cornmeal	&	prepaid	\\
-    matchbox	&	seabreeze	&	smartband	&	sixpoint	&	750ml	&	godiva	&	flite	&	tracfone \\
+    % 527	&	524	&	pebble	&	shiner	&	moscato	&	cadbury	&	dozen	&	smartphone	\\
+    % sartor	&	5pkt	&	garmin	&	peroni	&	blanc	&	ghirardelli	&	distance	&	 iphone\textregistered	\\
+    % selvedge	&	jegg	&	withings	&	bottles	&	cabernet	&	brookside	&	wilson	&	galaxy	\\
+    % carpenter	&	rockstar	&	vivosmart	&	guinness	&	zinfandel	&	twix	&	golf	&	htc	\\
+    % stonewash	&	nouveau	&	activity	&	corona	&	sauvignon	&	butterfinger	&	cornmeal	&	prepaid	\\
+    % matchbox	&	seabreeze	&	smartband	&	sixpoint	&	750ml	&	godiva	&	flite	&	tracfone \\
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -93,8 +93,7 @@ We demonstrate that our end-to-end system does not require feature engineering o
 \subsection{Rule Integration} % (fold)
 \label{sub:rule-integration}
 
-We conducted the experiments for six categories listed in Table~\ref{tab:numrules}. Since current implementation
-of generative model is binary(\cite(link to snorkel)), we applied it to each category separately and combined the results in a final output.
+We conducted the experiments for six categories listed in Table~\ref{tab:numrules}. We applied it to each category separately and combined the results in a final output.
 
 The generative model outputs marginal probabilites for each product item. Figure~\ref{fig:genmodel_pred_probs} demonstrates
 the distribution of those probabilities for some categories.
@@ -108,7 +107,7 @@ We used unlabeled product items to train generative model and applied learned mo
 prediction accuracy. The train and test sets contain respectively 100k and 20k product items. According to
 our experimental results shown in Table~\ref{tab:evaluation}, 'Boots \textgreater Women' category has high precision/recall and accuracy due to
 precise and less conflictous rules, whereas 'Boots \textgreater Men' category has less rules but more overlaps and conflicts.
-High accuracy score in 'Men \greater Boots' category is associated with the large number of true negatives which overly exceed
+High accuracy score in 'Men \textgreater Boots' category is associated with the large number of true negatives which overly exceed
 true, false positives and false negatives in that category.
 
 Ultimately, we combine generated and manually labeled training sets to train a discriminative model to predict accurate product categories.

@@ -1,7 +1,7 @@
 % @Author: Xiaocheng Tang
 % @Date:   2017-05-11 22:03:41
 % @Last Modified by:   Xiaocheng Tang
-% @Last Modified time: 2017-05-21 00:20:35
+% @Last Modified time: 2017-05-22 01:01:28
 % !TEX root = ./abstract.tex
 
 Associating an item with a taxonomy is often the first step of organizing the online products. 
@@ -21,7 +21,7 @@ A rule can often be considered as a classifier with output 1 (matched), -1 (not-
 Another important component of the item categorization system is to deal with the category taxonomy. 
 A standard approach is to decompose the problem into a sequence of multi-class classifications in a recursive top-down manner\cite{authur2010,cai2004hierarchical}: 
 first discriminate the subsets of categories at the top level of the hierarchy before going down the next level to discern the categories (or sets of categories) in those subsets. This process is repeated until reaching the bottom level.  
-There are however two major shortcomings about the approach: 1. \emph{error propagation} where the mistakes made at the top-level will be carried over all the way to the leaf categories; 2. \emph{data scarcity and imbalance} where as the category become more specific the less training data there is for that category; and 3. \emph{large dimension with no knowledge sharing} where each category has its own sets of parameters trained independently of the other categories.
+There are however several major shortcomings about the approach: 1. \emph{error propagation} where the mistakes made at the top-level will be carried over all the way to the leaf categories; 2. \emph{data scarcity and imbalance} where as the category become more specific the less training data there is for that category; and 3. \emph{large dimension with no knowledge sharing} where each category has its own sets of parameters trained independently of the other categories.
 
 In our item categorization system we design the main component to directly address the above issues. At the core of our solution is a \emph{two-layers neural network}, with the first layer corresponding to the feature parameters and the second layer targeting the \emph{leaf category} parameters. 
 While the reduction on the dimensionality is significant, from before O(|feature| x |all categories|), to now O(|feature| + |leaf categories|), we will also see that it enables knowledge sharing across categories such that unique features for a particular category get promoted and those features common to all categories get downvoted. 
