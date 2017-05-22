@@ -93,23 +93,23 @@ We demonstrate that our end-to-end system does not require feature engineering o
 \subsection{Rule Integration} % (fold)
 \label{sub:rule-integration}
 
-We conducted the experiments for six categories listed in Table (\ref{tab:numrules}). Since current implementation
+We conducted the experiments for six categories listed in Table~\ref{tab:numrules}. Since current implementation
 of generative model is binary(\cite(link to snorkel)), we applied it to each category separately and combined the results in a final output.
 
-The generative model outputs marginal probabilites for each product item. Figure (\ref{fig:genmodel_pred_probs}) demonstrates
+The generative model outputs marginal probabilites for each product item. Figure~\ref{fig:genmodel_pred_probs} demonstrates
 the distribution of those probabilities for some categories.
-We assume that the product belongs to certain category if prediction probability is greater or equal to 0.5.
+We assume that the product belongs to certain category if prediction probability is greater than or equal to 0.5.
 
-In addition, we demonstrate the fraction of coverage, overlaps and conflicts in Figure (\ref{fig:covconflict}). The diagram shows
+In addition, we demonstrate the fraction of coverage, overlaps and conflicts in Figure~\ref{fig:covconflict}. The diagram shows
  small rule coverage and the presence of conflicts and overlaps in 'Boots \textgreater Men' category. The overlaps and conflicts
 are computed for each labeling function with respect to other functions.
 
 We used unlabeled product items to train generative model and applied learned model to manually label test data and measure
 prediction accuracy. The train and test sets contain respectively 100k and 20k product items. According to
-our experimental results shown in table (\ref{tab:evaluation}), 'Boots \textgreater Women' category has high precision/recall and accuracy due to
+our experimental results shown in Table~\ref{tab:evaluation}, 'Boots \textgreater Women' category has high precision/recall and accuracy due to
 precise and less conflictous rules, whereas 'Boots \textgreater Men' category has less rules but more overlaps and conflicts.
-High accuracy score in 'Men \greater Boots' category is associated with the large number of true negatives which overly exceeds
-true/false positives and false negatives in that category.
+High accuracy score in 'Men \greater Boots' category is associated with the large number of true negatives which overly exceed
+true, false positives and false negatives in that category.
 
 Ultimately, we combine generated and manually labeled training sets to train a discriminative model to predict accurate product categories.
 
